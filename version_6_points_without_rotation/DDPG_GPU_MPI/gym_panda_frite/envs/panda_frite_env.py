@@ -22,14 +22,20 @@ import pybullet_data as pd
 
 import math
 
+import threading
+import time
+
 from gym_panda_frite.envs.debug_gui import Debug_Gui
 
 class PandaFriteEnv(gym.Env):
 	
-	def __init__(self, database = None, distance_threshold = None, gui = None):
+	def __init__(self, database = None, distance_threshold = None, gui = None, reset_env = True):
 		
+		self.reset_env = reset_env
 		self.database = database
 		self.debug_lines_gripper_array = [0, 0, 0, 0]
+		
+		self.gui = gui
 		
 		# bullet paramters
 		#self.timeStep=1./240
@@ -57,7 +63,7 @@ class PandaFriteEnv(gym.Env):
 		
 		self.seed()
 		
-		if gui == True:
+		if self.gui == True:
 			# connect bullet
 			p.connect(p.GUI) #or p.GUI (for test) or p.DIRECT (for train) for non-graphical version
 		else:
@@ -84,7 +90,7 @@ class PandaFriteEnv(gym.Env):
 		self.database.set_env(self)
 		self.database.load()
 		
-		self.reset()
+		self.initial_reset()
 		
 		self.panda_list_lower_limits, self.panda_list_upper_limits, self.panda_list_joint_ranges, self.panda_list_initial_poses = self.get_panda_joint_ranges()
 			 
@@ -95,7 +101,74 @@ class PandaFriteEnv(gym.Env):
 		#self.show_cartesian_sliders()
 		
 		p.stepSimulation()
+		
+		if self.gui == True:
+			self.draw_thread = threading.Thread(target=self.loop_update_cross)
+			self.draw_thread.start()
+
+
+	def loop_update_cross(self):
+		while True:
+			self.draw_id_to_follow()
+			
+	def initial_reset(self):
+		#p.resetSimulation()
+		
+		# Set Gravity to the environment
+		#p.setGravity(0, 0, 0)
+		
+		# reset pybullet to deformable object
+		p.resetSimulation(p.RESET_USE_DEFORMABLE_WORLD)
+
+		# bullet setup
+		# add pybullet path
+		currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+		#print("currentdir = {}".format(currentdir))
+		p.setAdditionalSearchPath(currentdir)
+		
+		#p.setAdditionalSearchPath(pd.getDataPath())
+		
+		#p.setTimeStep(0.003)
+		p.setPhysicsEngineParameter(numSubSteps = self.n_substeps)
+		#p.setPhysicsEngineParameter(numSubSteps = self.n_substeps, fixedTimeStep = 0.0003, numSolverIterations = 500, useSplitImpulse = 1, erp = 0.1, solverResidualThreshold = 0.001, sparseSdfVoxelSize = 0.25)
+		#p.setPhysicsEngineParameter(numSubSteps = self.n_substeps, fixedTimeStep = self.timeStep, numSolverIterations = 500)
+		#p.setPhysicsEngineParameter(numSubSteps = self.n_substeps, fixedTimeStep = self.timeStep, numSolverIterations = 500, useSplitImpulse = 1, erp = 0.1, solverResidualThreshold = 0.001, sparseSdfVoxelSize = 0.25)
+		p.setTimeStep(self.timeStep)
+
+		# Set Gravity to the environment
+		p.setGravity(0, 0, -9.81)
+		#p.setGravity(0, 0, 0)
+		
+		# load plane
+		self.load_plane()
+		p.stepSimulation()
+
+		# load table
+		self.load_table()
+		p.stepSimulation()
+		
+		#load panda
+		self.load_panda()
+		p.stepSimulation()
+		
+		# set panda joints to initial positions
+		self.set_panda_initial_joints_positions()
+		p.stepSimulation()
+		
+		# set gym spaces
+		self.set_gym_spaces()
+		
+		# load frite
+		self.load_frite()
+		p.stepSimulation()
 	
+		# anchor frite to gripper
+		self.create_anchor_panda()
+		p.stepSimulation()
+		
+		# close gripper
+		#self.close_gripper()
+		p.stepSimulation()
 	
 	def draw_all_ids_mesh_frite(self):
 		data = p.getMeshData(self.frite_id, -1, flags=p.MESH_DATA_SIMULATION_MESH)
@@ -158,6 +231,7 @@ class PandaFriteEnv(gym.Env):
 		list_positions = self.get_position_id_frite()
 		for i in range(len(self.id_frite_to_follow)):
 			self.debug_gui.draw_cross("id_frite_"+str(i), a_pos = list_positions[i], a_color = [0, 0, 1])
+			p.stepSimulation()
 			
 	def sample_goal(self):
 		return self.database.get_random_targets()
@@ -464,6 +538,8 @@ class PandaFriteEnv(gym.Env):
 		for i in range(len(jointPoses)):
 			p.setJointMotorControl2(self.panda_id, i, p.POSITION_CONTROL, jointPoses[i],force=10 * 240.)
 	
+		if self.gui == True:	
+			time.sleep(5)
 	
 	def get_obs(self):
 		eff_link_state = p.getLinkState(self.panda_id, self.panda_end_eff_idx, computeLinkVelocity=1)
@@ -527,67 +603,11 @@ class PandaFriteEnv(gym.Env):
 		# p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, self.if_render) enble if want to control rendering 
 		return obs, reward, done, info
 		
-	def reset(self, use_frite=True):
+	def reset(self):
 		
-		#p.resetSimulation()
-		
-		# Set Gravity to the environment
-		#p.setGravity(0, 0, 0)
-		
-		# reset pybullet to deformable object
-		p.resetSimulation(p.RESET_USE_DEFORMABLE_WORLD)
-
-		# bullet setup
-		# add pybullet path
-		currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-		#print("currentdir = {}".format(currentdir))
-		p.setAdditionalSearchPath(currentdir)
-		
-		#p.setAdditionalSearchPath(pd.getDataPath())
-		
-		#p.setTimeStep(0.003)
-		p.setPhysicsEngineParameter(numSubSteps = self.n_substeps)
-		#p.setPhysicsEngineParameter(numSubSteps = self.n_substeps, fixedTimeStep = 0.0003, numSolverIterations = 500, useSplitImpulse = 1, erp = 0.1, solverResidualThreshold = 0.001, sparseSdfVoxelSize = 0.25)
-		#p.setPhysicsEngineParameter(numSubSteps = self.n_substeps, fixedTimeStep = self.timeStep, numSolverIterations = 500)
-		#p.setPhysicsEngineParameter(numSubSteps = self.n_substeps, fixedTimeStep = self.timeStep, numSolverIterations = 500, useSplitImpulse = 1, erp = 0.1, solverResidualThreshold = 0.001, sparseSdfVoxelSize = 0.25)
-		p.setTimeStep(self.timeStep)
-
-		# Set Gravity to the environment
-		p.setGravity(0, 0, -9.81)
-		#p.setGravity(0, 0, 0)
-		
-		# load plane
-		self.load_plane()
-		p.stepSimulation()
-
-		# load table
-		self.load_table()
-		p.stepSimulation()
-		
-		#load panda
-		self.load_panda()
-		p.stepSimulation()
-		
-		# set panda joints to initial positions
-		self.set_panda_initial_joints_positions()
-		p.stepSimulation()
-		
-		# set gym spaces
-		self.set_gym_spaces()
-		
-		if use_frite:
-			# load frite
-			self.load_frite()
-			p.stepSimulation()
-		
-			# anchor frite to gripper
-			self.create_anchor_panda()
-			p.stepSimulation()
-			
-			# close gripper
-			#self.close_gripper()
-			p.stepSimulation()
-		
+		if self.reset_env:
+			print('reset env !')
+			self.initial_reset()
 		
 		# sample a new goal
 		self.goal = self.sample_goal()

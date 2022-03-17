@@ -55,6 +55,7 @@ parser.add_argument('--db_nb_y', default=22, type=int) # how to divide the 'goal
 parser.add_argument('--db_nb_z', default=10, type=int) # how to divide the 'goal space' on z to generate a 'goal' database
 parser.add_argument('--gui', default=False, type=bool) # boolean to show or not the gui
 parser.add_argument('--txt_values_path', default='./txt_values/', type=str)
+parser.add_argument('--reset_env', default=False, type=bool) # boolean to reset each episode the bullet env 
 
 args = parser.parse_args()
 
@@ -87,7 +88,7 @@ def main():
            return        
 	
     db = Database_Frite(path_load=load_path_databases, load_name=args.load_database_name, generate_name=args.generate_database_name, path_generate=generate_path_databases, nb_x=args.db_nb_x, nb_y=args.db_nb_y, nb_z=args.db_nb_z)
-    env = gym.make(args.env_name, database=db, distance_threshold=args.distance_threshold, gui=args.gui)
+    env = gym.make(args.env_name, database=db, distance_threshold=args.distance_threshold, gui=args.gui, reset_env=args.reset_env)
     
     env.seed(args.random_seed + MPI.COMM_WORLD.Get_rank())
     torch.manual_seed(args.random_seed + MPI.COMM_WORLD.Get_rank())
@@ -106,7 +107,9 @@ def main():
         agent.load()
         n_episodes = 100
         n_steps = 10
+        n_dones = 0
         sum_distance_error = 0
+        list_episode_error = []
         for episode in range(n_episodes):
             print("Episode : {}".format(episode))
            
@@ -121,14 +124,15 @@ def main():
                
                 new_state, reward, done, info = env.step(action)
                 current_distance_error = info['mean_distance_error']
-                if (args.gui):
-                    env.draw_id_to_follow()
+                #if (args.gui):
+                #    env.draw_id_to_follow()
                 
                 print("step={}, distance_error={}".format(step,info['mean_distance_error']))
                 #print("step={}, action={}, reward={}, done={}, info={}".format(step,action,reward, done, info))
                 state = new_state
                
                 if done:
+                   n_dones += 1
                    print("done with step={}  !".format(step))
                    break
             if (args.gui):
@@ -136,8 +140,11 @@ def main():
             
            
             sum_distance_error += current_distance_error
+            list_episode_error.append(current_distance_error)
         print("mean distance error = {}".format(sum_distance_error/n_episodes))
         print("sum distance error = {}".format(sum_distance_error))
+        print("nb dones = {}".format(n_dones))
+        print("std error episode = {}, min error episode = {}, max error episode = {}".format(np.std(np.array(list_episode_error)),min(list_episode_error),max(list_episode_error)))
 		
     elif args.mode == 'train':
         start=datetime.now()
@@ -194,82 +201,7 @@ def main():
            f_max_rewards.close()
            print("end mode train !")
            print("time elapsed = {}".format(datetime.now()-start))
-        
-        
-    elif args.mode == 'debug_cartesian':	
-        state = env.reset(use_frite=True)
-        env.draw_env_box()
-        env.show_cartesian_sliders()
-        env.draw_all_ids_mesh_frite()
-        while True:
-            keys = p.getKeyboardEvents()
             
-            env.apply_cartesian_sliders()
-            env.draw_gripper_position()
-            env.draw_id_to_follow()
-            #env.draw_text_gripper_position()
-            #env.draw_text_joints_values()
-            
-            
-            
-            if 65309 in keys:
-               break 
-    elif args.mode == 'debug_articular':	
-        state = env.reset(use_frite=True)
-        env.draw_env_box()
-        env.show_sliders()
-        while True:
-            keys = p.getKeyboardEvents()
-            
-            env.apply_sliders()
-            env.draw_gripper_position()
-            env.draw_id_to_follow()
-            env.draw_text_gripper_position()
-            env.draw_text_joints_values()
-           
-            if 65309 in keys:
-               break 
-    elif args.mode == 'simple_test':
-        state = env.reset(use_frite=True)
-        env.draw_env_box()
-        env.draw_gripper_position()
-        print("first state = {}".format(state))
-        env.draw_all_ids_mesh_frite()
-        while True:
-            keys = p.getKeyboardEvents()
-            if 65309 in keys:
-               break	       
-    elif args.mode == 'generate_database':
-        state = env.reset(use_frite=True)
-        env.draw_env_box()
-        
-        db.print_config()
-        
-        time.sleep(2)
-        
-        db.generate()
-        
-        print("End !")
-        
-        while True:
-            keys = p.getKeyboardEvents()
-            if 65309 in keys:
-               break
-               
-    elif args.mode == 'show_database':
-        state = env.reset(use_frite=True)
-        env.draw_env_box()
-        
-        db.print_config()
-        db.debug_all_points()
-        #db.debug_all_random_points(100)
-        #print("random targets = {}".format(db.get_random_targets()))
-        
-        while True:
-            keys = p.getKeyboardEvents()
-            if 65309 in keys:
-               break
-               
     else:
         raise NameError("mode wrong!!!")
         
