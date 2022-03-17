@@ -1,10 +1,8 @@
 <br>The paper "Robotic Control of the Deformation of Soft Linear Objects Using Deep Reinforcement Learning", written by Mélodie Hani Daniel Zakaria<a href="#note1" id="note1ref"><sup>1</sup></a>, Miguel Aranda<a href="#note2" id="note2ref"><sup>2</sup></a>, Laurent Lequièvre<a href="#note1" id="note1ref"><sup>1</sup></a>, Sébastien Lengagne<a href="#note1" id="note1ref"><sup>1</sup></a>, Juan Antonio Corrales Ramón<a href="#note3" id="note3ref"><sup>3</sup></a> and Youcef Mezouar<a href="#note1" id="note1ref"><sup>1</sup></a>, has been submitted to CASE 2022.
+<br>
 <br>We address the problem of controlling the deformation of a DLO using a robot arm that manipulates it. For simplicity, the robot grasps one end of the object, and the other end is fixed to the ground. The object is represented by a mesh and we describe its deformation by a set of selected mesh nodes. The objective is to control the arm so that the positions of the selected nodes are driven to prescribed values. The difficulty of this indirect control problem lies in the fact that the dynamical model of the system to be controlled is complex and uncertain. We propose a generalizable architecture to solve this problem based on DRL.
 
 
-<br><a id="note1" href="#note1ref"><sup>1</sup></a>CNRS, Clermont Auvergne INP, Institut Pascal,  Université Clermont Auvergne, Clermont-Ferrand, France.
-<br><a id="note2" href="#note2ref"><sup>2</sup></a>Instituto de Investigación en Ingeniería de Aragón, Universidad de Zaragoza, Zaragoza, Spain.
-<br><a id="note3" href="#note3ref"><sup>3</sup></a>Centro Singular de Investigación en Tecnoloxías Intelixentes (CiTIUS),  Universidade de Santiago de Compostela, Santiago de Compostela, Spain.
 
 ## How to install virtualenv on ubuntu 20.04
 
@@ -70,3 +68,7 @@ cd DDPG_GPU_MPI
 <br>python main.py --mode generate_database --generate_db_dir_name '/extra_small/'  --db_nb_x 5 --db_nb_y 20 --db_nb_z 5
 
 <br>Create a file named 'database_id_frite.txt' in the directory 'DDPG_GPU_MPI/databases/extra_small'.
+<br>
+<br><a id="note1" href="#note1ref"><sup>1</sup></a>CNRS, Clermont Auvergne INP, Institut Pascal,  Université Clermont Auvergne, Clermont-Ferrand, France.
+<br><a id="note2" href="#note2ref"><sup>2</sup></a>Instituto de Investigación en Ingeniería de Aragón, Universidad de Zaragoza, Zaragoza, Spain.
+<br><a id="note3" href="#note3ref"><sup>3</sup></a>Centro Singular de Investigación en Tecnoloxías Intelixentes (CiTIUS),  Universidade de Santiago de Compostela, Santiago de Compostela, Spain.
