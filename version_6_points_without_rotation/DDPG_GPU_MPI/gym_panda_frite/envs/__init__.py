@@ -1,1 +1,0 @@
-from gym_panda_frite.envs.panda_frite_env import PandaFriteEnv
