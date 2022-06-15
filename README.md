@@ -48,16 +48,16 @@ n : number of mpi processors requested.
 ## How to train
 
 cd DDPG_GPU_MPI
-<br>mpirun -n 32 python main.py --max_episode 63 --max_step 300 --log_interval 10 --save_dir_name './w32_s_t005/' --load_db_dir_name '/small/' --distance_threshold 0.05
+<br>mpirun -n 32 python main.py --max_episode 63 --max_step 300 --log_interval 10 --save_dir_name './w32_s_t005/' --load_db_dir_name '/small_train/' --distance_threshold 0.05
 
-<br>The database used is a file named 'database_id_frite.txt' by default in the directory 'DDPG_GPU_MPI/databases/small'
+<br>The database used is a file named 'database_id_frite.txt' by default in the directory 'DDPG_GPU_MPI/databases/small_train'
 <br>The neural network weights will be saved in the directory 'DDPG_GPU_MPI/w32_s_t005'
 
 ## How to test
 
 cd DDPG_GPU_MPI
-<br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large/'  --distance_threshold 0.05
-<br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large/'  --distance_threshold 0.05 --reset_env True
+<br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large_test/'  --distance_threshold 0.05
+<br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large_test/'  --distance_threshold 0.05 --reset_env True
 
 
 <br>
