@@ -40,14 +40,9 @@ n : number of mpi processors requested.
 <br>batch_size : size of the trained tuples.
 <br>distance_threshold : distance necessary to success the goal.
 <br>save_dir_name : name of neural weights directory (create it when it doesn't exist).
-<br>generate_database_name : name of generated 'goal' database (by default 'database_id_frite.txt').
 <br>load_database_name : name of loaded 'goal' database (by default 'database_id_frite.txt').
 <br>load_db_dir_name : directory name of 'goal' database loaded.
-<br>db_nb_x : how to divide the 'goal space' on x to generate a 'goal' database.
-<br>db_nb_y : how to divide the 'goal space' on y to generate a 'goal' database.
-<br>db_nb_z : how to divide the 'goal space' on z to generate a 'goal' database.
 <br>random_seed : value to initialize the random number generator
-<br>generate_db_dir_name : directory name of generated database 
 <br>reset_env : boolean to reset the bullet env for each episode
 
 ## How to train
