@@ -45,14 +45,9 @@ parser.add_argument('--max_memory_size', default=50000, type=int) # size of DDPG
 parser.add_argument('--random_seed', default=9527, type=int) # value to initialize the random number generator
 parser.add_argument('--save_dir_name', default='./weights/', type=str) # name of neural weights directory (create it when it doesn't exist)
 parser.add_argument('--cuda', default=False, type=bool) # use cuda
-parser.add_argument('--generate_database_name', default='database_id_frite.txt', type=str) # name of generated 'goal' database (by default 'database_id_frite.txt')
 parser.add_argument('--load_database_name', default='database_id_frite.txt', type=str) # name of loaded 'goal' database (by default 'database_id_frite.txt')
 parser.add_argument('--distance_threshold', default=0.05, type=float) # distance necessary to success the goal
-parser.add_argument('--generate_db_dir_name', default='/default_generate/', type=str) # directory name of generated database 
 parser.add_argument('--load_db_dir_name', default='/default_load/', type=str) # directory name of 'goal' database loaded
-parser.add_argument('--db_nb_x', default=8, type=int) # how to divide the 'goal space' on x to generate a 'goal' database
-parser.add_argument('--db_nb_y', default=22, type=int) # how to divide the 'goal space' on y to generate a 'goal' database
-parser.add_argument('--db_nb_z', default=10, type=int) # how to divide the 'goal space' on z to generate a 'goal' database
 parser.add_argument('--gui', default=False, type=bool) # boolean to show or not the gui
 parser.add_argument('--txt_values_path', default='./txt_values/', type=str)
 parser.add_argument('--reset_env', default=False, type=bool) # boolean to reset each episode the bullet env 
@@ -68,7 +63,6 @@ def main():
     directory = args.save_dir_name
     txt_values_path = args.txt_values_path
     root_path_databases = "./databases"
-    generate_path_databases = root_path_databases + args.generate_db_dir_name
     load_path_databases = root_path_databases + args.load_db_dir_name
     
     print("load_path_databases = {}, name database = {}".format(load_path_databases,args.load_database_name))
@@ -81,8 +75,6 @@ def main():
                os.makedirs(txt_values_path)
             if not os.path.isdir(directory):
                 os.makedirs(directory)
-            if not os.path.isdir(generate_path_databases):
-                os.makedirs(generate_path_databases)
             if not os.path.isdir(load_path_databases):
                 os.makedirs(load_path_databases)
     
@@ -90,7 +82,7 @@ def main():
            raise RuntimeError("=> Database file to load does not exit : " + load_path_databases + args.load_database_name)
            return        
 	
-    db = Database_Frite(path_load=load_path_databases, load_name=args.load_database_name, generate_name=args.generate_database_name, path_generate=generate_path_databases, nb_x=args.db_nb_x, nb_y=args.db_nb_y, nb_z=args.db_nb_z)
+    db = Database_Frite(path_load=load_path_databases, load_name=args.load_database_name)
     env = gym.make(args.env_name, database=db, distance_threshold=args.distance_threshold, gui=args.gui, reset_env=args.reset_env)
     
     env.seed(args.random_seed + MPI.COMM_WORLD.Get_rank())

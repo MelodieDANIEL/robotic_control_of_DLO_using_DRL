@@ -5,16 +5,10 @@ from numpy import random
 import math
 
 class Database_Frite:
-	def __init__(self, path_load, load_name, path_generate, generate_name, nb_x=10, nb_y=30, nb_z=10):
+	def __init__(self, path_load, load_name):
 		
 		self.load_name = load_name
-		self.generate_name = generate_name
 		self.path_load = path_load
-		self.path_generate = path_generate
-		
-		self.nb_x = nb_x
-		self.nb_y = nb_y
-		self.nb_z = nb_z
 		
 		self.nb_lines = 0
 		self.nb_deformations = 0
@@ -23,7 +17,6 @@ class Database_Frite:
 		self.data = None
 		self.nb_points = None
 		
-		print("nb_x={}, nb_y={}, nb_z={}".format(self.nb_x,self.nb_y,self.nb_z))
 	
 	def set_env(self, env):
 		self.env = env
@@ -31,48 +24,11 @@ class Database_Frite:
 	
 	
 	def print_config(self):
-		self.init_spaces()
-		
-		d_x = self.goal_high[0] - self.goal_low[0]
-		d_y = self.goal_high[1] - self.goal_low[1]
-		d_z = self.goal_high[2] - self.goal_low[2]
-		
 		print("****** CONFIG DATABASE ***************")
-		print("nb_x={}, nb_y={}, nb_z={}".format(self.nb_x,self.nb_y,self.nb_z))
-		print("d_x={}, d_y={}, d_z={}".format(d_x,d_y,d_z))
-		print("step_x={}, step_y={}, step_z={}".format(self.step_x,self.step_y,self.step_z))
-		print("range_x={}, range_y={}, range_z={}".format(self.range_x,self.range_y,self.range_z))
-		print("delta_x={}, delta_y={}".format(self.delta_x,self.delta_y))
+		print("nb lines = {}, nb points = {}, nb_deformations = {}".format(self.nb_lines, self.nb_points,self.nb_deformations))
+		print("shape = {}".format(self.data.shape))	
 		print("**************************************")
-		
-		
-	
-	def init_spaces(self):
-		
-		self.gripper_position = self.env.get_gripper_position()
-		self.goal_low = self.env.goal_space.low
-		self.goal_high = self.env.goal_space.high
-		
-		#self.delta_x = math.ceil(((self.gripper_position[0]-self.goal_low[0])/(self.goal_high[0]-self.goal_low[0]))*self.nb_x) + 1
-		#self.delta_y = math.ceil(((self.gripper_position[1]-self.goal_low[1])/(self.goal_high[1]-self.goal_low[1]))*self.nb_y) + 1
-		
-		
-		self.step_x = float((self.goal_high[0]-self.goal_low[0])/(self.nb_x +1))
-		self.step_y = float((self.goal_high[1]-self.goal_low[1])/(self.nb_y + 1))
-		self.step_z = float((self.goal_high[2]-self.goal_low[2])/(self.nb_z + 1))
-		
-		
-		self.delta_x = math.ceil((self.gripper_position[0]-self.goal_low[0])/self.step_x)
-		self.delta_y = math.ceil((self.gripper_position[1]-self.goal_low[1])/self.step_y)
-		
-		print("delta_x={}, delta_y={}".format(self.delta_x,self.delta_y))
-
-		self.range_x = self.nb_x + 1
-		self.range_y = self.nb_y + 1
-		self.range_z = self.nb_z + 1
-		
-		print("step_x={}, step_y={}, step_z={}".format(self.step_x,self.step_y,self.step_z))
-			
+					
 
 	def debug_point(self, pt, offset = 0.1, width = 3.0, color = [1, 0, 0]):
 		
@@ -137,23 +93,3 @@ class Database_Frite:
 			
 		#print("id={}, x={}, y={}, z={}".format(int(line_split[0]), float(line_split[1]), float(line_split[2]), float(line_split[3])))
 		
-		
-	def write_floats(self, f):
-		list_id_frite = self.env.get_position_id_frite()
-		ids_frite = self.env.id_frite_to_follow
-		
-		for k in range(len(list_id_frite)):
-			f.write("{} {:.3f} {:.3f} {:.3f}\n".format(ids_frite[k], list_id_frite[k][0],  list_id_frite[k][1], list_id_frite[k][2]))
-	
-	def go_to_corner(self):
-		# go to corner
-		d_x_y_z= [-self.step_x, 0.0, 0.0]
-		for x in range(self.delta_x):
-			self.env.set_action_cartesian(d_x_y_z)
-			p.stepSimulation()
-
-		d_x_y_z= [0.0, -self.step_y, 0.0]
-		for y in range(self.delta_y):
-			self.env.set_action_cartesian(d_x_y_z)
-			p.stepSimulation()
-
