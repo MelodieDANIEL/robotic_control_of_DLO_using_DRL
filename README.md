@@ -65,12 +65,6 @@ cd DDPG_GPU_MPI
 <br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large/'  --distance_threshold 0.05 --reset_env True
 
 
-## How to generate a database
-
-cd DDPG_GPU_MPI
-<br>python main.py --mode generate_database --generate_db_dir_name '/small/'  --db_nb_x 5 --db_nb_y 20 --db_nb_z 5
-
-<br>Create a file named 'database_id_frite.txt' in the directory 'DDPG_GPU_MPI/databases/small'.
 <br>
 <br><a id="note1" href="#note1ref"><sup>1</sup></a>CNRS, Clermont Auvergne INP, Institut Pascal,  Université Clermont Auvergne, Clermont-Ferrand, France.
 <br><a id="note2" href="#note2ref"><sup>2</sup></a>Instituto de Investigación en Ingeniería de Aragón, Universidad de Zaragoza, Zaragoza, Spain.
