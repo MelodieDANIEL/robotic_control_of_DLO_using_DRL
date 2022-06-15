@@ -6,6 +6,6 @@ logger = logging.getLogger(__name__)
 register(
     id='PandaFrite-v1',
     entry_point='gym_panda_frite.envs:PandaFriteEnv',
-    kwargs={'database': None, 'distance_threshold': None, 'gui': None}
+    kwargs={'database': None, 'distance_threshold': None, 'gui': None, 'reset_env': False}
 )
 
