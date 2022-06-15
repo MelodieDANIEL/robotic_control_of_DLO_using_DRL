@@ -71,6 +71,8 @@ def main():
     generate_path_databases = root_path_databases + args.generate_db_dir_name
     load_path_databases = root_path_databases + args.load_db_dir_name
     
+    print("load_path_databases = {}, name database = {}".format(load_path_databases,args.load_database_name))
+    
     rank = MPI.COMM_WORLD.Get_rank()
     
     if MPI.COMM_WORLD.Get_rank() == 0:
@@ -106,7 +108,7 @@ def main():
         print("mode test !")
         agent.load()
         n_episodes = 100
-        n_steps = 10
+        n_steps = 30
         n_dones = 0
         sum_distance_error = 0
         list_episode_error = []
@@ -114,6 +116,7 @@ def main():
             print("Episode : {}".format(episode))
            
             state = env.reset()
+            time.sleep(0.5)
             if (args.gui):
                env.draw_env_box()
                time.sleep(0.5)
@@ -124,8 +127,8 @@ def main():
                
                 new_state, reward, done, info = env.step(action)
                 current_distance_error = info['mean_distance_error']
-                #if (args.gui):
-                #    env.draw_id_to_follow()
+                if (args.gui):
+                    env.draw_id_to_follow()
                 
                 print("step={}, distance_error={}".format(step,info['mean_distance_error']))
                 #print("step={}, action={}, reward={}, done={}, info={}".format(step,action,reward, done, info))
@@ -201,7 +204,8 @@ def main():
            f_max_rewards.close()
            print("end mode train !")
            print("time elapsed = {}".format(datetime.now()-start))
-            
+     
+    	            
     else:
         raise NameError("mode wrong!!!")
         

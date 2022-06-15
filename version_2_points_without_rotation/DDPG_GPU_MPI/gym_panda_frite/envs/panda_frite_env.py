@@ -101,13 +101,6 @@ class PandaFriteEnv(gym.Env):
 		
 		p.stepSimulation()
 		
-		if self.gui == True:
-			self.draw_thread = threading.Thread(target=self.loop_update_cross)
-			self.draw_thread.start()
-	
-	def loop_update_cross(self):
-		while True:
-			self.draw_id_to_follow()
 			
 	def initial_reset(self):
 		#p.resetSimulation()
@@ -535,10 +528,10 @@ class PandaFriteEnv(gym.Env):
 		
 		for i in range(len(jointPoses)):
 			p.setJointMotorControl2(self.panda_id, i, p.POSITION_CONTROL, jointPoses[i],force=10 * 240.)
-			
+		"""	
 		if self.gui == True:	
 			time.sleep(5)
-	
+		"""
 	def get_obs(self):
 		eff_link_state = p.getLinkState(self.panda_id, self.panda_end_eff_idx, computeLinkVelocity=1)
 		gripper_link_pos = np.array(eff_link_state[0]) # gripper cartesian world position = 3 float (x,y,z) = achieved goal

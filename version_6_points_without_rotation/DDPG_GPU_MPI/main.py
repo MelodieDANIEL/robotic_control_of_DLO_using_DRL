@@ -106,7 +106,7 @@ def main():
         print("mode test !")
         agent.load()
         n_episodes = 100
-        n_steps = 10
+        n_steps = 30
         n_dones = 0
         sum_distance_error = 0
         list_episode_error = []
@@ -124,8 +124,8 @@ def main():
                
                 new_state, reward, done, info = env.step(action)
                 current_distance_error = info['mean_distance_error']
-                #if (args.gui):
-                #    env.draw_id_to_follow()
+                if (args.gui):
+                    env.draw_id_to_follow()
                 
                 print("step={}, distance_error={}".format(step,info['mean_distance_error']))
                 #print("step={}, action={}, reward={}, done={}, info={}".format(step,action,reward, done, info))
@@ -201,6 +201,7 @@ def main():
            f_max_rewards.close()
            print("end mode train !")
            print("time elapsed = {}".format(datetime.now()-start))
+    
             
     else:
         raise NameError("mode wrong!!!")
