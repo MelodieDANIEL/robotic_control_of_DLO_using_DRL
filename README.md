@@ -1,4 +1,4 @@
-<br>The paper "Robotic Control of the Deformation of Soft Linear Objects Using Deep Reinforcement Learning", written by Mélodie Hani Daniel Zakaria<a href="#note1" id="note1ref"><sup>1</sup></a>, Miguel Aranda<a href="#note2" id="note2ref"><sup>2</sup></a>, Laurent Lequièvre<a href="#note1" id="note1ref"><sup>1</sup></a>, Sébastien Lengagne<a href="#note1" id="note1ref"><sup>1</sup></a>, Juan Antonio Corrales Ramón<a href="#note3" id="note3ref"><sup>3</sup></a> and Youcef Mezouar<a href="#note1" id="note1ref"><sup>1</sup></a>, has been submitted to CASE 2022.
+<br>The paper "Robotic Control of the Deformation of Soft Linear Objects Using Deep Reinforcement Learning", written by Mélodie Hani Daniel Zakaria<a href="#note1" id="note1ref"><sup>1</sup></a>, Miguel Aranda<a href="#note2" id="note2ref"><sup>2</sup></a>, Laurent Lequièvre<a href="#note1" id="note1ref"><sup>1</sup></a>, Sébastien Lengagne<a href="#note1" id="note1ref"><sup>1</sup></a>, Juan Antonio Corrales Ramón<a href="#note3" id="note3ref"><sup>3</sup></a> and Youcef Mezouar<a href="#note1" id="note1ref"><sup>1</sup></a>, has been accepted for publication in the proceedings of CASE 2022.
 <br>
 <br>We address the problem of controlling the deformation of a DLO using a robot arm that manipulates it. For simplicity, the robot grasps one end of the object, and the other end is fixed to the ground. The object is represented by a mesh and we describe its deformation by a set of selected mesh nodes. The objective is to control the arm so that the positions of the selected nodes are driven to prescribed values. The difficulty of this indirect control problem lies in the fact that the dynamical model of the system to be controlled is complex and uncertain. We propose a generalizable architecture to solve this problem based on DRL.
 
@@ -59,6 +59,19 @@ cd DDPG_GPU_MPI
 <br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large_test/'  --distance_threshold 0.05
 <br>python main.py --mode test --gui True --save_dir_name './w32_s_t005/' --load_db_dir_name   '/large_test/'  --distance_threshold 0.05 --reset_env True
 
+## How to generate the deformations databases
+
+<br>1) A box should be selected among the three we proposed and settled as Gym Space. 
+
+<br>2) It is necessary to define how the robotic arm will cover the box: it can be in a sequential way, in a random way, or by mixing both ways. It is also possible to add to the data some noise.
+
+<br>3) We generated two databases for each box (i.e., small, medium, and large), one for training in a sequential way and one for testing in a random way.
+
+## General remarks
+
+<br>1) The test results will vary due to the random selection of the deformation of the soft object from the database. This variation can be up to 10-15%.
+
+<br>2) The Computation of the deformation (i.e., the current position of the controlled mesh nodes) of the soft object by the physics-based simulation engine PyBullet depends on the CPU power. This might lead to tests failure. If the CPU power changes (because the PC used for the training is different from the one used for the testing), the achieved deformations might also change since PyBullet will calculate the current deformations differently from the ones the neural network was trained on. The neural network will no longer be able to achieve the desired deformations since the deformation reached by the soft object will be different from the one expected by the agent. In this case, we advise to train and test the agent on the same PC.
 
 <br>
 <br><a id="note1" href="#note1ref"><sup>1</sup></a>CNRS, Clermont Auvergne INP, Institut Pascal,  Université Clermont Auvergne, Clermont-Ferrand, France.
