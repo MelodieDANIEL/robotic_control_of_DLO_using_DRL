@@ -610,6 +610,9 @@ class PandaFriteEnv(gym.Env):
 		self.draw_goal()
 		p.stepSimulation()
 		
+		for i in range(10):
+			p.stepSimulation()
+		
 		
 		return self.get_obs()
 		
